@@ -583,6 +583,24 @@
     <div class="hstat" id="hstat"></div>
   </header>
 
+  <!-- ☁ 클라우드 버튼 + 배너 (cloud.js가 동작하면 보임) -->
+  <button id="cloudBtn" aria-label="클라우드 / 로그인" hidden style="
+    position:absolute;right:14px;top:calc(10px + env(safe-area-inset-top));z-index:50;
+    width:40px;height:40px;border:0;border-radius:50%;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    box-shadow:0 2px 12px -4px rgba(110,150,80,.4);
+    font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink)">☁</button>
+  <div id="browseBanner" hidden style="
+    position:absolute;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
+    z-index:50;background:var(--green-deep);color:#fff;font-weight:700;font-size:12px;
+    padding:7px 14px;border-radius:20px;display:flex;align-items:center;gap:8px;
+    box-shadow:var(--shadow);white-space:nowrap"></div>
+  <div class="scrim" id="cloudScrim"></div>
+  <div class="sheet" id="cloudSheet">
+    <div class="grab"></div>
+    <div id="cloudPanel"></div>
+  </div>
+
   <main>
     <!-- PLANNER -->
     <section class="view on" id="v-plan">
