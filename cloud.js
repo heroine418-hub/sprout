@@ -114,11 +114,14 @@
     updateUI(null);
   }
 
-  /* ── UI ── */
-  function openSheet(){ scrim.classList.add('on'); sheet.classList.add('on'); }
-  function closeSheet(){ scrim.classList.remove('on'); sheet.classList.remove('on'); }
-  btn.addEventListener('click', ()=>{ renderPanel(); openSheet(); });
-  scrim.addEventListener('click', closeSheet);
+  function openSheet(){ /* HTML 인라인 스크립트가 처리 */ }
+  function closeSheet(){
+    if(window.__closeCloud) window.__closeCloud();
+    else { scrim.classList.remove('on'); sheet.classList.remove('on'); }
+  }
+
+  /* cloud.js 준비 완료 — HTML 인라인이 이 함수를 호출함 */
+  window.__cloudOpen = function(){ renderPanel(); };
 
   function updateUI(browsingName){
     btn.style.background = (session && !browsing) ? 'var(--green-deep)' : 'rgba(255,255,255,.85)';

@@ -598,8 +598,27 @@
   <div class="scrim" id="cloudScrim"></div>
   <div class="sheet" id="cloudSheet">
     <div class="grab"></div>
-    <div id="cloudPanel"></div>
+    <div id="cloudPanel"><p style="color:var(--ink-soft);font-size:13px">로딩 중…</p></div>
   </div>
+  <script>
+  /* 클라우드 버튼 — cloud.js 로드 여부와 무관하게 항상 동작 */
+  (function(){
+    var btn   = document.getElementById('cloudBtn');
+    var scrim = document.getElementById('cloudScrim');
+    var sheet = document.getElementById('cloudSheet');
+    if(!btn||!scrim||!sheet) return;
+    function openCloud(){
+      scrim.classList.add('on'); sheet.classList.add('on');
+      if(window.__cloudOpen) window.__cloudOpen();
+    }
+    function closeCloud(){
+      scrim.classList.remove('on'); sheet.classList.remove('on');
+    }
+    btn.addEventListener('click', openCloud);
+    scrim.addEventListener('click', closeCloud);
+    window.__closeCloud = closeCloud;
+  })();
+  </script>
 
   <main>
     <!-- PLANNER -->
