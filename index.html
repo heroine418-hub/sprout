@@ -396,9 +396,6 @@
     header{grid-template-columns:1fr auto;gap:8px;
       padding:calc(8px + env(safe-area-inset-top)) 16px 6px}
     .greet{display:none}
-
-    /* 모바일: 가운데 큰 시계와 겹치지 않게 클라우드 버튼을 왼쪽으로 이동 */
-    #cloudBtn{ left:14px; right:auto; width:34px; height:34px; font-size:15px; }
     #browseBanner{ top:calc(52px + env(safe-area-inset-top)); }
 
     /* PLANNER — one scrollable column, week-grid first */
@@ -584,16 +581,17 @@
   <header>
     <div class="greet"><div class="eyebrow">Sprout</div><h1 id="greet">오늘도 한 칸씩 🌱</h1></div>
     <div class="now-clock"><div class="nc-t" id="ncTime">--:--:--</div><div class="nc-d" id="ncDate"></div></div>
-    <div class="hstat" id="hstat"></div>
+    <div class="hstat" id="hstat" style="display:flex;align-items:center;justify-content:flex-end;gap:10px">
+      <span id="hstatText"></span>
+      <button id="cloudBtn" aria-label="클라우드 / 로그인" style="
+        flex:0 0 auto;width:34px;height:34px;border:0;border-radius:50%;
+        background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+        box-shadow:0 2px 12px -4px rgba(110,150,80,.4);
+        font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink)">☁</button>
+    </div>
   </header>
 
-  <!-- ☁ 클라우드 버튼 + 배너 (cloud.js가 동작하면 보임) -->
-  <button id="cloudBtn" aria-label="클라우드 / 로그인" style="
-    position:absolute;right:14px;top:calc(10px + env(safe-area-inset-top));z-index:50;
-    width:40px;height:40px;border:0;border-radius:50%;
-    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
-    box-shadow:0 2px 12px -4px rgba(110,150,80,.4);
-    font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink)">☁</button>
+  <!-- ☁ 클라우드 배너/시트 -->
   <div id="browseBanner" hidden style="
     position:absolute;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);
     z-index:50;background:var(--green-deep);color:#fff;font-weight:700;font-size:12px;
@@ -987,7 +985,7 @@
   const slotToMin=s=>START_MIN+s*10;
   const minToTop=m=>(m-START_MIN)/10*ROW;
 
-  function updateHeaderStat(){const tb=blocksOn(keyOf(today)).reduce((s,b)=>s+b.durMin,0);$('#hstat').innerHTML=`오늘 계획<br><b>${durLabel(tb)}</b>`;}
+  function updateHeaderStat(){const tb=blocksOn(keyOf(today)).reduce((s,b)=>s+b.durMin,0);const el=$('#hstatText');if(el)el.innerHTML=`오늘 계획<br><b>${durLabel(tb)}</b>`;}
 
   /* ===== mini cal ===== */
   function renderMini(){
