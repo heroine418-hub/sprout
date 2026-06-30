@@ -1,3 +1,2 @@
-// Sprout 클라우드 동기화 설정
 window.SPROUT_SUPABASE_URL = "https://yoxkngiikexoqazcsdgk.supabase.co";
-window.SPROUT_SUPABASE_KEY = "sb_publishable_LfW4Dlfqz1diy-74whkDJw_nkJXRg7-";
+window.SPROUT_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlveGtuZ2lpa2V4b3FhemNzZGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3Njk3MzAsImV4cCI6MjA5ODM0NTczMH0.yj1NxUE39jRVZYJ0PvmOStsAaWvPV6JpsGz56LR-7W4";
