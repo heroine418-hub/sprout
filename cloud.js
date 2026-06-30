@@ -129,10 +129,12 @@
     btn.textContent = browsing ? '👀' : '☁';
     if(browsingName){
       banner.hidden = false;
+      banner.style.display = 'flex';
       banner.innerHTML = `👀 ${esc(browsingName)} 플래너 (읽기 전용)&nbsp;<button id="exitBrowseBtn" style="border:0;background:rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:3px 9px;font:inherit;font-weight:700;cursor:pointer">내 플래너로</button>`;
       document.getElementById('exitBrowseBtn').addEventListener('click', exitBrowse);
     } else {
       banner.hidden = true;
+      banner.style.display = 'none';
     }
   }
 
@@ -160,23 +162,28 @@
       const email = (document.getElementById('cloudEmail').value||'').trim();
       const pw    = document.getElementById('cloudPw').value;
       const msg   = document.getElementById('cloudMsg');
-      msg.textContent = '';
+      msg.style.color = '#C76B4E'; msg.textContent = '';
       if(!email || pw.length < 6){ msg.textContent='이메일과 6자 이상 비밀번호를 입력하세요.'; return; }
-      document.getElementById('cloudLogin').disabled = true;
-      document.getElementById('cloudSignup').disabled = true;
+      const loginBtn  = document.getElementById('cloudLogin');
+      const signupBtn = document.getElementById('cloudSignup');
+      loginBtn.disabled = true; signupBtn.disabled = true;
+      msg.style.color = 'var(--ink-soft)'; msg.textContent = '처리 중…';
       try{
         if(mode==='login'){
           const {error} = await sb.auth.signInWithPassword({email,password:pw});
           if(error) throw error;
         } else {
-          const {data,error} = await sb.auth.signUp({email,password:pw});
-          if(error) throw error;
-          if(!data.session){ msg.style.color='var(--green-deep)'; msg.textContent='확인 메일을 보냈어요. 메일함 확인 후 로그인하세요.'; return; }
+          /* 가입 시도 — 이미 있는 계정이면 바로 로그인 */
+          const {error:signUpErr} = await sb.auth.signUp({email,password:pw});
+          if(signUpErr && !signUpErr.message?.includes('already registered')) throw signUpErr;
+          /* 가입 성공 or 이미 있음 → 로그인 */
+          const {error:signInErr} = await sb.auth.signInWithPassword({email,password:pw});
+          if(signInErr) throw signInErr;
         }
       } catch(e){
-        msg.textContent = e.message||'오류가 발생했어요.';
-        document.getElementById('cloudLogin').disabled = false;
-        document.getElementById('cloudSignup').disabled = false;
+        msg.style.color = '#C76B4E';
+        msg.textContent = e.message || e.error_description || e.code || '오류가 발생했어요.';
+        loginBtn.disabled = false; signupBtn.disabled = false;
       }
     };
     document.getElementById('cloudLogin').addEventListener('click', ()=>doAuth('login'));
