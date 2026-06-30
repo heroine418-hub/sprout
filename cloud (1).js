@@ -14,8 +14,11 @@
   const banner = document.getElementById('browseBanner');
   const panel  = document.getElementById('cloudPanel');
 
-  if(!btn) return;
-  btn.hidden = false;
+  if(!btn) {
+    console.warn('[cloud] cloudBtn 요소를 찾을 수 없어요.');
+    return;
+  }
+  // 버튼은 HTML에서 이미 보이므로 별도 설정 불필요
 
   if(!URL_ || !KEY_ || typeof supabase === "undefined"){
     btn.addEventListener('click', ()=>{
@@ -111,11 +114,14 @@
     updateUI(null);
   }
 
-  /* ── UI ── */
-  function openSheet(){ scrim.classList.add('on'); sheet.classList.add('on'); }
-  function closeSheet(){ scrim.classList.remove('on'); sheet.classList.remove('on'); }
-  btn.addEventListener('click', ()=>{ renderPanel(); openSheet(); });
-  scrim.addEventListener('click', closeSheet);
+  function openSheet(){ /* HTML 인라인 스크립트가 처리 */ }
+  function closeSheet(){
+    if(window.__closeCloud) window.__closeCloud();
+    else { scrim.classList.remove('on'); sheet.classList.remove('on'); }
+  }
+
+  /* cloud.js 준비 완료 — HTML 인라인이 이 함수를 호출함 */
+  window.__cloudOpen = function(){ renderPanel(); };
 
   function updateUI(browsingName){
     btn.style.background = (session && !browsing) ? 'var(--green-deep)' : 'rgba(255,255,255,.85)';
@@ -154,23 +160,28 @@
       const email = (document.getElementById('cloudEmail').value||'').trim();
       const pw    = document.getElementById('cloudPw').value;
       const msg   = document.getElementById('cloudMsg');
-      msg.textContent = '';
+      msg.style.color = '#C76B4E'; msg.textContent = '';
       if(!email || pw.length < 6){ msg.textContent='이메일과 6자 이상 비밀번호를 입력하세요.'; return; }
-      document.getElementById('cloudLogin').disabled = true;
-      document.getElementById('cloudSignup').disabled = true;
+      const loginBtn  = document.getElementById('cloudLogin');
+      const signupBtn = document.getElementById('cloudSignup');
+      loginBtn.disabled = true; signupBtn.disabled = true;
+      msg.style.color = 'var(--ink-soft)'; msg.textContent = '처리 중…';
       try{
         if(mode==='login'){
           const {error} = await sb.auth.signInWithPassword({email,password:pw});
           if(error) throw error;
         } else {
-          const {data,error} = await sb.auth.signUp({email,password:pw});
-          if(error) throw error;
-          if(!data.session){ msg.style.color='var(--green-deep)'; msg.textContent='확인 메일을 보냈어요. 메일함 확인 후 로그인하세요.'; return; }
+          /* 가입 시도 — 이미 있는 계정이면 바로 로그인 */
+          const {error:signUpErr} = await sb.auth.signUp({email,password:pw});
+          if(signUpErr && !signUpErr.message?.includes('already registered')) throw signUpErr;
+          /* 가입 성공 or 이미 있음 → 로그인 */
+          const {error:signInErr} = await sb.auth.signInWithPassword({email,password:pw});
+          if(signInErr) throw signInErr;
         }
       } catch(e){
-        msg.textContent = e.message||'오류가 발생했어요.';
-        document.getElementById('cloudLogin').disabled = false;
-        document.getElementById('cloudSignup').disabled = false;
+        msg.style.color = '#C76B4E';
+        msg.textContent = e.message || e.error_description || e.code || '오류가 발생했어요.';
+        loginBtn.disabled = false; signupBtn.disabled = false;
       }
     };
     document.getElementById('cloudLogin').addEventListener('click', ()=>doAuth('login'));
